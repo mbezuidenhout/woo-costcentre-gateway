@@ -1,1 +1,1 @@
-<span>A requisition form has been e-mailed to you. Please complete the form and forward to</span>
+<span>Please complete a cost centre requisition form the form and forward to <?php echo get_option( 'admin_email' ); ?></span>
