@@ -46,6 +46,9 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 
 		// Customer Emails.
 		add_action( 'woocommerce_email_before_order_table', array( $this, 'email_instruction' ), 10, 2 );
+
+		// Administrator Emails.
+		add_action( 'woocommerce_email_order_meta', array( $this, 'admin_email_order_meta' ), 10, 3 );
 	}
 
 	/**
@@ -56,7 +59,6 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 	 */
 	public function email_instruction( $order, $sent_to_admin ) {
 		if ( ! $sent_to_admin && $this->id === $order->get_payment_method() && $order->has_status( 'on-hold' ) ) {
-			//echo wp_kses_post( sprintf( __( 'Complete a requisition form and return it to %s to confirm your order.', 'woo-costcentre-gateway' ), get_option( 'admin_email' ) ) );
 			wc_get_template( 'email-instruction.php', array( 'order' => $order ), 'woo-costcentre-gateway', plugin_dir_path( __DIR__ ) . 'templates/' );
 		}
 	}
@@ -177,5 +179,29 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 				'desc_tip'    => true,
 			),
 		);
+	}
+
+	/**
+	 * @param WC_Order $order
+	 * @param $sent_to_admin
+	 * @param $plain_text
+	 */
+	public function admin_email_order_meta($order, $sent_to_admin, $plain_text) {
+		if ( ! $sent_to_admin && $this->id === $order->get_payment_method() ) {
+			foreach ( $this->get_gateway_fields() as $field ) {
+				$value = get_post_meta( $order->get_id(), '_' . $this->id . '_' . $field['name'], true );
+				if ( $plain_text ) {
+					echo esc_html( $field['label'] . ':' ) . "\n";
+					echo esc_html( $value ) . "\n";
+				} else {
+					?>
+					<p class="woo-costcentre-gateway-detail">
+						<strong><?php echo esc_html( $field['label'] . ':' ); ?></strong>
+						<div class="woo-costcentre-gateway-value"><?php echo esc_html( $value ); ?></div>
+					</p>
+					<?php
+				}
+			}
+		}
 	}
 }
