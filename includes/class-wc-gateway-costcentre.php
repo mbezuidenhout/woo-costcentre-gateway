@@ -56,8 +56,7 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 	 */
 	public function email_instructions( $order, $sent_to_admin ) {
 		if ( ! $sent_to_admin && $this->id === $order->get_payment_method() && $order->has_status( 'on-hold' ) ) {
-			echo wp_kses_post( 'Complete a requisition form and return it to ' . get_option( 'admin_email' ) );
-			do_action( 'woo_costcentre_gateway_email_instructions', $order );
+			echo wp_kses_post( sprintf( __( 'Complete a requisition form and return it to %s to confirm your order.', 'woo-costcentre-gateway' ), get_option( 'admin_email' ) ) );
 		}
 	}
 
@@ -81,7 +80,7 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 		$order->add_order_note( __( 'This order is awaiting confirmation from the shop manager', 'woo-costcentre-gateway' ) );
 
 		foreach ( $this->gateway_fields as $gateway_field ) {
-			$order->add_meta_data( $gateway_field['name'], $_REQUEST[ $gateway_field['name'] ] );
+			$order->add_meta_data( $gateway_field['name'], wc_clean( $_REQUEST[ $gateway_field['name'] ] ) );
 		}
 
 		do_action( 'woo_costcentre_gateway_process_payment', $order_id );
@@ -148,7 +147,7 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 	 */
 	public function init_form_fields() {
 		$this->form_fields = array(
-			'enabled'          => array(
+			'enabled'     => array(
 				'title'       => __( 'Enable/Disable', 'woo-costcentre-gateway' ),
 				'type'        => 'checkbox',
 				'label'       => __( 'Enable cost centre payment option', 'woo-costcentre-gateway' ),
@@ -156,14 +155,14 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 				'default'     => 'yes',
 				'desc_tip'    => true,
 			),
-			'title'            => array(
+			'title'       => array(
 				'title'       => __( 'Title', 'woo-costcentre-gateway' ),
 				'type'        => 'text',
 				'description' => __( 'This controls the title which the user sees during checkout.', 'woo-costcentre-gateway' ),
 				'default'     => __( 'Cost Centre', 'woo-costcentre-gateway' ),
 				'desc_tip'    => true,
 			),
-			'description'      => array(
+			'description' => array(
 				'title'       => __( 'Description', 'woo-costcentre-gateway' ),
 				'type'        => 'text',
 				'description' => __( 'This controls the description which the user sees during checkout.', 'woo-costcentre-gateway' ),

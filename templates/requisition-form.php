@@ -1,14 +1,15 @@
 <?php
 /**
-* Requisition form.
-*
-* This template can be overridden by copying it to yourtheme/woo-costcentre-gateway/requisition-form.php
-*
-* @version 1.0.0
-* @since   1.0.0
-* @var array $gateway_fields
-*
-*/
+ * The template for displaying a cost centre fields.
+ *
+ * This template can be overridden by copying it to yourtheme/woo-costcentre-gateway/requisition-form.php
+ * @package Woo_Costcentre_Gateway/Templates
+ * @version 1.0.0
+ * @since   1.0.0
+ * @var array $gateway_fields
+ *
+ */
+
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
