@@ -112,6 +112,9 @@ class Woo_Costcentre_Gateway {
 
 		$this->loader = new Woo_Costcentre_Gateway_Loader();
 
+		if ( is_admin() ) {
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-costcentre-gateway-admin.php';
+		}
 	}
 
 	/**

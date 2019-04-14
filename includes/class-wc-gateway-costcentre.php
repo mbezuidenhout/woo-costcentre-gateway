@@ -45,7 +45,7 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'thankyou_page' ) );
 
 		// Customer Emails.
-		add_action( 'woocommerce_email_before_order_table', array( $this, 'email_instructions' ), 10, 2 );
+		add_action( 'woocommerce_email_before_order_table', array( $this, 'email_instruction' ), 10, 2 );
 	}
 
 	/**
@@ -54,10 +54,15 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 	 * @param WC_Order $order Order object.
 	 * @param bool     $sent_to_admin Sent to admin.
 	 */
-	public function email_instructions( $order, $sent_to_admin ) {
+	public function email_instruction( $order, $sent_to_admin ) {
 		if ( ! $sent_to_admin && $this->id === $order->get_payment_method() && $order->has_status( 'on-hold' ) ) {
-			echo wp_kses_post( sprintf( __( 'Complete a requisition form and return it to %s to confirm your order.', 'woo-costcentre-gateway' ), get_option( 'admin_email' ) ) );
+			//echo wp_kses_post( sprintf( __( 'Complete a requisition form and return it to %s to confirm your order.', 'woo-costcentre-gateway' ), get_option( 'admin_email' ) ) );
+			wc_get_template( 'email-instruction.php', array( 'order' => $order ), 'woo-costcentre-gateway', plugin_dir_path( __DIR__ ) . 'templates/' );
 		}
+	}
+
+	public function get_gateway_fields() {
+		return $this->gateway_fields;
 	}
 
 	/**
@@ -80,8 +85,10 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 		$order->add_order_note( __( 'This order is awaiting confirmation from the shop manager', 'woo-costcentre-gateway' ) );
 
 		foreach ( $this->gateway_fields as $gateway_field ) {
-			$order->add_meta_data( $gateway_field['name'], wc_clean( $_REQUEST[ $gateway_field['name'] ] ) );
+			// Add _ to beginning of meta data to set it as protected
+			$order->add_meta_data( '_' . $this->id . '_' . $gateway_field['name'], wc_clean( $_REQUEST[ $gateway_field['name'] ] ) );
 		}
+		$order->save();
 
 		do_action( 'woo_costcentre_gateway_process_payment', $order_id );
 
