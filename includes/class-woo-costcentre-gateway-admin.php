@@ -58,7 +58,7 @@ class Woo_Costcentre_Gateway_Admin {
 
 		if ( 'costcentre' === $payment_gateway->id ) {
 
-			foreach ( $payment_gateway->get_gateway_fields() as $field ) {
+			foreach ( $payment_gateway->fields->get_payment_fields() as $field ) {
 				$value = get_post_meta( $order->get_id(), '_' . $payment_gateway->id . '_' . $field['name'], true );
 				if ( ! empty( $value ) ) {
 					?>

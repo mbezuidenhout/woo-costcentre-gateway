@@ -23,7 +23,8 @@
  */
 class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 
-	protected $gateway_fields;
+	/** @var Woo_Costcentre_Gateway_Payment_Fields */
+	public $fields;
 
 	public function __construct() {
 		/* Mandatory payment gateway fields */
@@ -36,8 +37,8 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 
 		$this->title = $this->get_option( 'title' );
 
-		$this->init_form_fields();
-		$this->init_payment_fields();
+		$this->fields = new Woo_Costcentre_Gateway_Payment_Fields();
+		$this->init_settings_fields();
 		$this->init_settings();
 
 		// Actions.
@@ -51,6 +52,8 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 		add_action( 'woocommerce_email_order_meta', array( $this, 'admin_email_order_meta' ), 10, 3 );
 	}
 
+
+
 	/**
 	 * Add content to the WC emails.
 	 *
@@ -63,10 +66,6 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 		}
 	}
 
-	public function get_gateway_fields() {
-		return $this->gateway_fields;
-	}
-
 	/**
 	 * Process the payment and return the result.
 	 *
@@ -77,6 +76,12 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 
 		$order = new WC_Order( $order_id );
 
+		foreach ( $this->fields->get_payment_fields() as $gateway_field ) {
+			// Add _ to beginning of meta data to set it as protected
+			$order->add_meta_data( '_' . $this->id . '_' . $gateway_field['name'], wc_clean( $_REQUEST[ $gateway_field['name'] ] ) );
+		}
+		$order->save();
+
 		// Mark as on-hold (we're awaiting for authorisation).
 		$order->update_status( apply_filters( 'woocommerce_process_payment_order_status_' . $this->id, 'on-hold', $order ), __( 'Awaiting cost centre authorisation', 'woo-costcentre-gateway' ) );
 
@@ -85,12 +90,6 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 
 		// Add custom order note
 		$order->add_order_note( __( 'This order is awaiting confirmation from the shop manager', 'woo-costcentre-gateway' ) );
-
-		foreach ( $this->gateway_fields as $gateway_field ) {
-			// Add _ to beginning of meta data to set it as protected
-			$order->add_meta_data( '_' . $this->id . '_' . $gateway_field['name'], wc_clean( $_REQUEST[ $gateway_field['name'] ] ) );
-		}
-		$order->save();
 
 		do_action( 'woo_costcentre_gateway_process_payment', $order_id );
 
@@ -102,21 +101,8 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 
 	}
 
-	public function init_payment_fields() {
-		$this->gateway_fields = array(
-			array(
-				'id'       => 'woo-costcentre-number',
-				'class'    => 'input-text',
-				'name'     => 'woo_costcentre_number',
-				'label'    => 'Cost centre number',
-				'required' => true,
-			),
-		);
-		$this->gateway_fields = apply_filters( 'woo_costcentre_gateway_form_fields', $this->gateway_fields );
-	}
-
 	public function payment_fields() {
-		wc_get_template( 'requisition-form.php', array( 'gateway_fields' => $this->gateway_fields ), 'woo-costcentre-gateway', plugin_dir_path( __DIR__ ) . 'templates/' );
+		wc_get_template( 'requisition-form.php', array( 'gateway_fields' => $this->fields->get_payment_fields() ), 'woo-costcentre-gateway', plugin_dir_path( __DIR__ ) . 'templates/' );
 	}
 
 	/**
@@ -134,7 +120,7 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 		if ( empty( $nonce_value ) || ! wp_verify_nonce( $nonce_value, 'woocommerce-process_checkout' ) ) {
 			throw new Exception( __( 'We were unable to process your order, please try again.', 'woocommerce' ) );
 		}
-		foreach ( $this->gateway_fields as $field ) {
+		foreach ( $this->fields->get_payment_fields() as $field ) {
 			if ( $field['required'] && empty( $validate_fields[ $field['name'] ] ) ) {
 				wc_add_notice( $field['label'] . ' ' . __( 'cannnot be empty', 'woo-costcentre-gateway' ), 'error' );
 			}
@@ -154,7 +140,7 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 	 *
 	 * @since 1.0.0
 	 */
-	public function init_form_fields() {
+	public function init_settings_fields() {
 		$this->form_fields = array(
 			'enabled'     => array(
 				'title'       => __( 'Enable/Disable', 'woo-costcentre-gateway' ),
@@ -188,7 +174,7 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 	 */
 	public function admin_email_order_meta($order, $sent_to_admin, $plain_text) {
 		if ( ! $sent_to_admin && $this->id === $order->get_payment_method() ) {
-			foreach ( $this->get_gateway_fields() as $field ) {
+			foreach ( $this->fields->get_payment_fields() as $field ) {
 				$value = get_post_meta( $order->get_id(), '_' . $this->id . '_' . $field['name'], true );
 				if ( $plain_text ) {
 					echo esc_html( $field['label'] . ':' ) . "\n";

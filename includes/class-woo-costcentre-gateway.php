@@ -113,8 +113,19 @@ class Woo_Costcentre_Gateway {
 		$this->loader = new Woo_Costcentre_Gateway_Loader();
 
 		if ( is_admin() ) {
+			/**
+			 * The class responsible for defining all actions that occur in the admin area.
+			 */
 			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-costcentre-gateway-admin.php';
 		}
+
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-costcentre-gateway-payment-fields.php';
+
+		/**
+		 * The class responsible for defining all actions that occur in the public-facing
+		 * side of the site.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-costcentre-gateway-public.php';
 	}
 
 	/**
@@ -142,6 +153,8 @@ class Woo_Costcentre_Gateway {
 	 * @access   private
 	 */
 	private function define_hooks() {
+		$public_plugin = new Woo_Costcentre_Gateway_Public();
+		$this->loader->add_action( 'woocommerce_email_order_details', $public_plugin, 'order_details', 40, 3 );
 		$this->loader->add_action( 'plugins_loaded', $this, 'woo_gateway_init', 0 );
 	}
 
