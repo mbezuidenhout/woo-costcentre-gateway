@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The file that defines the payment gateway.
  *
@@ -23,9 +22,16 @@
  */
 class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 
-	/** @var Woo_Costcentre_Gateway_Payment_Fields */
+	/**
+	 * List of checkout fields.
+	 *
+	 * @var Woo_Costcentre_Gateway_Payment_Fields
+	 */
 	public $fields;
 
+	/**
+	 * WC_Gateway_Costcentre constructor.
+	 */
 	public function __construct() {
 		/* Mandatory payment gateway fields */
 		$this->id                 = 'costcentre';
@@ -42,7 +48,10 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 		$this->init_settings();
 
 		// Actions.
-		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
+		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array(
+			$this,
+			'process_admin_options'
+		) );
 		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'thankyou_page' ) );
 
 		// Customer Emails.
@@ -53,23 +62,25 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 	}
 
 
-
 	/**
 	 * Add content to the WC emails.
 	 *
 	 * @param WC_Order $order Order object.
-	 * @param bool     $sent_to_admin Sent to admin.
+	 * @param bool $sent_to_admin Sent to admin.
 	 */
 	public function email_instruction( $order, $sent_to_admin ) {
 		if ( ! $sent_to_admin && $this->id === $order->get_payment_method() && $order->has_status( 'on-hold' ) ) {
 			wc_get_template( 'email-instruction.php', array( 'order' => $order ), 'woo-costcentre-gateway', plugin_dir_path( __DIR__ ) . 'templates/' );
 		}
+
+		do_action( 'woo_costcentre_gateway_after_email_instructions', $order, $sent_to_admin );
 	}
 
 	/**
 	 * Process the payment and return the result.
 	 *
 	 * @param int $order_id Order ID.
+	 *
 	 * @return array
 	 */
 	public function process_payment( $order_id ) {
@@ -77,7 +88,7 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 		$order = new WC_Order( $order_id );
 
 		foreach ( $this->fields->get_payment_fields() as $gateway_field ) {
-			// Add _ to beginning of meta data to set it as protected
+			// Add _ to beginning of meta data to set it as protected.
 			$order->add_meta_data( '_' . $this->id . '_' . $gateway_field['name'], wc_clean( $_REQUEST[ $gateway_field['name'] ] ) );
 		}
 		$order->save();
@@ -88,7 +99,7 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 		// Remove cart.
 		WC()->cart->empty_cart();
 
-		// Add custom order note
+		// Add custom order note.
 		$order->add_order_note( __( 'This order is awaiting confirmation from the shop manager', 'woo-costcentre-gateway' ) );
 
 		do_action( 'woo_costcentre_gateway_process_payment', $order_id );
@@ -101,13 +112,18 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 
 	}
 
+	/**
+	 * Template to use for displaying the payment fields.
+	 */
 	public function payment_fields() {
 		wc_get_template( 'requisition-form.php', array( 'gateway_fields' => $this->fields->get_payment_fields() ), 'woo-costcentre-gateway', plugin_dir_path( __DIR__ ) . 'templates/' );
 	}
 
 	/**
+	 * Check out fields validation.
+	 *
 	 * @return bool
-	 * @throws Exception
+	 * @throws Exception Exception is thrown if order could not be completed.
 	 */
 	public function validate_fields() {
 		$nonce_value = wc_get_var( $_REQUEST['woocommerce-process-checkout-nonce'], wc_get_var( $_REQUEST['_wpnonce'], '' ) ); // phpcs:ignore
@@ -122,14 +138,21 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 		}
 		foreach ( $this->fields->get_payment_fields() as $field ) {
 			if ( $field['required'] && empty( $validate_fields[ $field['name'] ] ) ) {
-				wc_add_notice( $field['label'] . ' ' . __( 'cannnot be empty', 'woo-costcentre-gateway' ), 'error' );
+				/* translators: %s: Field name */
+				wc_add_notice( sprintf( __( '%s is a required field.', 'woo-costcentre-gateway' ), '<strong>' . $field['label'] . '</strong>' ), 'error' );
 			}
 		}
 
-		do_action( 'woo_costcentre_gateway_validate_fields' );
+		do_action( 'woo_costcentre_gateway_validate_fields', $validate_fields );
+
 		return false;
 	}
 
+	/**
+	 * Displayed after the user has checked out.
+	 *
+	 * @param int $order_id The order ID.
+	 */
 	public function thankyou_page( $order_id ) {
 		$order = wc_get_order( $order_id );
 		wc_get_template( 'thankyou.php', array( 'order' => $order ), 'woo-costcentre-gateway', plugin_dir_path( __DIR__ ) . 'templates/' );
@@ -168,11 +191,13 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 	}
 
 	/**
-	 * @param WC_Order $order
-	 * @param $sent_to_admin
-	 * @param $plain_text
+	 * Send order via email to administrator.
+	 *
+	 * @param WC_Order $order An instance of WC_Order.
+	 * @param bool $sent_to_admin A boolean value to indicate if the email has been sent.
+	 * @param bool $plain_text A boolean value to indicate if the email should be sent as plain text.
 	 */
-	public function admin_email_order_meta($order, $sent_to_admin, $plain_text) {
+	public function admin_email_order_meta( $order, $sent_to_admin, $plain_text ) {
 		if ( ! $sent_to_admin && $this->id === $order->get_payment_method() ) {
 			foreach ( $this->fields->get_payment_fields() as $field ) {
 				$value = get_post_meta( $order->get_id(), '_' . $this->id . '_' . $field['name'], true );
@@ -181,10 +206,10 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 					echo esc_html( $value ) . "\n";
 				} else {
 					?>
-					<p class="woo-costcentre-gateway-detail">
-						<strong><?php echo esc_html( $field['label'] . ':' ); ?></strong>
-						<div class="woo-costcentre-gateway-value"><?php echo esc_html( $value ); ?></div>
-					</p>
+                    <p class="woo-costcentre-gateway-detail">
+                        <strong><?php echo esc_html( $field['label'] . ':' ); ?></strong>
+                    <div class="woo-costcentre-gateway-value"><?php echo esc_html( $value ); ?></div>
+                    </p>
 					<?php
 				}
 			}
