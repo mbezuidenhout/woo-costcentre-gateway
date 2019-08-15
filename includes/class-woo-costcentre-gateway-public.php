@@ -37,7 +37,7 @@ class Woo_Costcentre_Gateway_Public {
 			foreach ( $fields as $field ) {
 				$value = get_post_meta( $order->get_id(), '_' . $payment_gateway->id . '_' . $field['name'], true );
 				if ( $plain_text ) {
-					echo $field['label'] . ': ' . $value . "\n"; // phpcs:ignore
+					echo $field['label'] . ': ' . $value . "\n"; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 				} else {
 					echo '<p><strong>' . esc_html( $field['label'] ) . ':</strong> ' . esc_html( $value ) . '</p>';
 				}

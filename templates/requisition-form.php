@@ -24,5 +24,5 @@ foreach ( $gateway_fields as $gateway_field ) {
 	}
 	$field  = sprintf( '<label for="%s">%s</label>', $gateway_field['id'], $label );
 	$field .= sprintf( '<input autocorrect="no" autocapitalize="no" spellcheck="no" id="%s" type="text" class="%s" name="%s" />', $gateway_field['id'], $gateway_field['class'], $gateway_field['name'] );
-	echo $field; //phpcs:ignore
+	echo $field; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 }

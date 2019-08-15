@@ -62,11 +62,12 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 	}
 
 
+
 	/**
 	 * Add content to the WC emails.
 	 *
 	 * @param WC_Order $order Order object.
-	 * @param bool $sent_to_admin Sent to admin.
+	 * @param bool     $sent_to_admin Sent to admin.
 	 */
 	public function email_instruction( $order, $sent_to_admin ) {
 		if ( ! $sent_to_admin && $this->id === $order->get_payment_method() && $order->has_status( 'on-hold' ) ) {
@@ -80,7 +81,6 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 	 * Process the payment and return the result.
 	 *
 	 * @param int $order_id Order ID.
-	 *
 	 * @return array
 	 */
 	public function process_payment( $order_id ) {
@@ -126,7 +126,7 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 	 * @throws Exception Exception is thrown if order could not be completed.
 	 */
 	public function validate_fields() {
-		$nonce_value = wc_get_var( $_REQUEST['woocommerce-process-checkout-nonce'], wc_get_var( $_REQUEST['_wpnonce'], '' ) ); // phpcs:ignore
+		$nonce_value = wc_get_var( $_REQUEST['woocommerce-process-checkout-nonce'], wc_get_var( $_REQUEST['_wpnonce'], '' ) ); // phpcs:ignore WordPress.Security.NonceVerification
 		wp_verify_nonce( wp_unslash( $nonce_value ), 'woocommerce-process_checkout' );
 		$validate_fields = $_REQUEST;
 		if ( $_REQUEST['payment_method'] !== $this->id ) {
@@ -144,7 +144,6 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 		}
 
 		do_action( 'woo_costcentre_gateway_validate_fields', $validate_fields );
-
 		return false;
 	}
 
@@ -206,10 +205,10 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 					echo esc_html( $value ) . "\n";
 				} else {
 					?>
-                    <p class="woo-costcentre-gateway-detail">
-                        <strong><?php echo esc_html( $field['label'] . ':' ); ?></strong>
-                    <div class="woo-costcentre-gateway-value"><?php echo esc_html( $value ); ?></div>
-                    </p>
+					<p class="woo-costcentre-gateway-detail">
+						<strong><?php echo esc_html( $field['label'] . ':' ); ?></strong>
+						<div class="woo-costcentre-gateway-value"><?php echo esc_html( $value ); ?></div>
+					</p>
 					<?php
 				}
 			}

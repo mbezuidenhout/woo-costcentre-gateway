@@ -17,7 +17,7 @@
  * Description:       Process payments made via company cost centre.
  * Version:           1.0.1
  * Author:            Marius Bezuidenhout
- * Author URI:        https://www.facebook.com/marius.bezuidenhout1
+ * Author URI:        https://profiles.wordpress.org/mbezuidenhout/
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       woo-costcentre-gateway
