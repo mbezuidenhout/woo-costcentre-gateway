@@ -22,6 +22,8 @@
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       woo-costcentre-gateway
  * Domain Path:       /languages
+ * WC tested up to:   3.6.5
+ * WC requires at least: 3.0
  */
 
 // If this file is called directly, abort.
