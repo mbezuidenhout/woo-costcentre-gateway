@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The file that defines the core plugin class
  *
@@ -158,6 +157,9 @@ class Woo_Costcentre_Gateway {
 		$this->loader->add_action( 'plugins_loaded', $this, 'woo_gateway_init', 0 );
 	}
 
+	/**
+	 * Add the filter to add the payment method to WooCommerce.
+	 */
 	public function woo_gateway_init() {
 		if ( ! class_exists( 'WC_Payment_Gateway' ) ) {
 			return;
@@ -173,6 +175,10 @@ class Woo_Costcentre_Gateway {
 
 	/**
 	 * Add the Gateway to WooCommerce
+	 *
+	 * @param array $methods An array of payment methods.
+	 *
+	 * @return array
 	 **/
 	public function add_gateway( $methods ) {
 		$methods[] = 'WC_Gateway_Costcentre';

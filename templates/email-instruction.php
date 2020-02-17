@@ -11,7 +11,8 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
+/* translators: e-mail address */
 echo wp_kses_post( sprintf( __( 'Complete a requisition form and return it to %s to confirm your order.', 'woo-costcentre-gateway' ), get_option( 'admin_email' ) ) );

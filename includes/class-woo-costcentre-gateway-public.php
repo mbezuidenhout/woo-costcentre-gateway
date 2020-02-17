@@ -22,14 +22,24 @@
 class Woo_Costcentre_Gateway_Public {
 
 	/**
-	 * @param WC_Order $order
-	 * @param bool $sent_to_admin
-	 * @param bool $plain_text
+	 * Display the order details in meta block.
+	 *
+	 * @param int|WC_Order $order Order ID or instance of WC_Order.
+	 * @param bool         $sent_to_admin Order details sent to admin.
+	 * @param bool         $plain_text Echo plain text format.
 	 */
 	public function order_details( $order, $sent_to_admin, $plain_text ) {
-		/** @var WC_Gateway_Costcentre $payment_gateway */
+		/**
+		 * Possibly an instance of WC_GatewayCostcentre.
+		 *
+		 * @var WC_Gateway_Costcentre
+		 */
 		$payment_gateway = wc_get_payment_gateway_by_order( $order );
-		// Details sent to admin
+		if ( ! is_object( $order ) ) {
+			$order_id = absint( $order );
+			$order    = wc_get_order( $order_id );
+		}
+		// Details sent to admin.
 		if ( $sent_to_admin &&
 			is_a( $payment_gateway, 'WC_Payment_Gateway' ) &&
 			'costcentre' === $payment_gateway->id ) {

@@ -21,27 +21,46 @@
  */
 class Woo_Costcentre_Gateway_Payment_Fields {
 
-	/** @var array */
-	protected $payment_fields;
+	/**
+	 * An array of payment fields.
+	 *
+	 * @var array
+	 */
+	protected $payment_fields = [];
 
-	public function __construct() {
-		$this->payment_fields = array(
-			array(
-				'id'       => 'woo-costcentre-number',
-				'class'    => 'input-text',
-				'name'     => 'woo_costcentre_number',
-				'label'    => 'Cost centre number',
-				'required' => true,
-			),
-		);
-		$this->payment_fields = apply_filters( 'woo_costcentre_gateway_form_fields', $this->payment_fields );
+	/**
+	 * The WC_Gateway_Costcentre instance.
+	 *
+	 * @var WC_Gateway_Costcentre
+	 */
+	private $gateway;
+
+	/**
+	 * Woo_Costcentre_Gateway_Payment_Fields constructor.
+	 *
+	 * @param WC_Gateway_Costcentre $gateway An instance of WC_Gateway_Costcentre.
+	 */
+	public function __construct( $gateway ) {
+		$this->gateway = $gateway;
 	}
 
 	/**
+	 * Add another field.
+	 *
+	 * @param array $field Field to add.
+	 */
+	public function add( $field ) {
+		$this->payment_fields[] = $field;
+	}
+
+	/**
+	 * Returns the payment fields.
+	 *
 	 * @return array
 	 */
 	public function get_payment_fields() {
-		return $this->payment_fields;
+		$fields = apply_filters( 'woo_costcentre_gateway_form_fields', $this->payment_fields, $this->gateway );
+		return $fields;
 	}
 
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Define the internationalization functionality
  *
@@ -13,6 +12,7 @@
  * @subpackage Woo_Costcentre_Gateway/includes
  */
 
+// phpcs:disable PEAR.NamingConventions.ValidClassName.Invalid
 /**
  * Define the internationalization functionality.
  *

@@ -10,17 +10,21 @@
 */
 
 /**
-* The file that defines admin features.
-*
-* This is used to define admin features such as payment details
-* in admin order view.
-*
-* @since      1.0.0
-* @package    Woo_Costcentre_Gateway
-* @subpackage Woo_Costcentre_Gateway/includes
-* @author     Marius Bezuidenhout <marius.bezuidenhout@gmail.com>
-*/
+ * The file that defines admin features.
+ *
+ * This is used to define admin features such as payment details
+ * in admin order view.
+ *
+ * @since      1.0.0
+ * @package    Woo_Costcentre_Gateway
+ * @subpackage Woo_Costcentre_Gateway/includes
+ * @author     Marius Bezuidenhout <marius.bezuidenhout@gmail.com>
+ */
 class Woo_Costcentre_Gateway_Admin {
+
+	/**
+	 * Woo_Costcentre_Gateway_Admin constructor.
+	 */
 	public function __construct() {
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ), 40 );
 	}
@@ -49,7 +53,7 @@ class Woo_Costcentre_Gateway_Admin {
 	/**
 	 * Output the captures cost centre details
 	 *
-	 * @param $post WP_Post
+	 * @param WP_Post $post Instance of WP_Post.
 	 */
 	public static function payment_details( $post ) {
 		$order = wc_get_order( $post->ID );
