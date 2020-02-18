@@ -15,7 +15,7 @@
  * Plugin Name:       WooCommerce Cost Centre Gateway
  * Plugin URI:        https://github.com/mbezuidenhout/woocommerce-costcentre-gateway
  * Description:       Process payments made via company cost centre.
- * Version:           1.0.1
+ * Version:           1.1.0
  * Author:            Marius Bezuidenhout
  * Author URI:        https://profiles.wordpress.org/mbezuidenhout/
  * License:           GPL-2.0+
@@ -34,7 +34,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'WOO_COSTCENTRE_GATEWAY_VERSION', '1.0.1' );
+define( 'WOO_COSTCENTRE_GATEWAY_VERSION', '1.1.0' );
 
 /**
  * The code that runs during plugin activation.

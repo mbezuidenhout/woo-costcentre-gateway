@@ -76,8 +76,6 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 		add_action( 'woocommerce_after_checkout_validation', [ $this, 'validate_checkout_fields' ], 10, 2 );
 	}
 
-
-
 	/**
 	 * Add content to the WC emails.
 	 *
@@ -145,7 +143,12 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 	 * @throws Exception Exception is thrown if order could not be completed.
 	 */
 	public function validate_checkout_fields( $data, $errors ) {
-		$validate_fields = $_REQUEST;
+		$validate_fields = [];
+		foreach ( $this->fields->get_payment_fields() as $field ) {
+			if ( isset( $_REQUEST[ $field['name'] ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+				$validate_fields[ $field['name'] ] = sanitize_text_field( wp_unslash( $_REQUEST[ $field['name'] ] ) ); // phpcs:ignore WordPress.Security.NonceVerification
+			}
+		}
 		if ( isset( $data['payment_method'] ) && $data['payment_method'] === $this->id ) {
 			$validate_fields = apply_filters( 'woo_costcentre_gateway_fields', $validate_fields );
 
@@ -159,7 +162,6 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 							'<strong>' . $field['label'] . '</strong>'
 						)
 					);
-					//wc_add_notice( sprintf( __( '%s is a required field.', 'woo-costcentre-gateway' ), '<strong>' . $field['label'] . '</strong>' ), 'error' );
 				} elseif ( ! empty( $field['regex'] ) && 0 === preg_match( $field['regex'], $validate_fields[ $field['name'] ] ) ) {
 					/* translators: 1: Field value 2: Field name */
 					$errors->add( 'payment', sprintf( __( '%1$s is not a valid %2$s.', 'woo-costcentre-gateway' ), '<strong>' . esc_html( $validate_fields[ $field['name'] ] ) . '</strong>', '<strong>' . $field['label'] . '</strong>' ) );
@@ -210,7 +212,7 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 			],
 			'cost_centre_regex' => [
 				'title'       => __( 'Cost Centre Pattern', 'woo-costcentre-gateway' ),
-				'type'        => 'text',
+				'type'        => 'regex',
 				'description' => __( 'Cost centre number regex pattern. See <a href="https://regexr.com">https://regexr.com</a> for guide.', 'woo-costcentre-gateway' ),
 				'default'     => '/^ZA\d{8}$/i',
 				'desc_tip'    => false,
@@ -243,5 +245,55 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Validate the Regular Expression
+	 *
+	 * @param string $key   Field ID.
+	 * @param string $value Field value.
+	 *
+	 * @return string Return the field value.
+	 * @throws Exception Throws error message if regular expression is not valid.
+	 */
+	public function validate_regex_field( $key, $value ) {
+		$is_valid = true;
+		try {
+			if ( false === @preg_match( wp_unslash( $value ), '' ) ) {
+				$is_valid = false;
+			}
+		} catch ( Exception $e ) {
+			$is_valid = false;
+		}
+		if ( ! $is_valid ) {
+			if ( isset( $this->form_fields[ $key ] ) ) {
+				$settings_field = $this->form_fields[ $key ];
+			} else {
+				/* translators: %s Field id */
+				throw new Exception( sprintf( __( 'Could not find setting field with id: %s.', 'woo-costcentre-gateway' ), $key ) );
+			}
+
+			// WooCommerce is supposed to show the message that has been thrown in the error.
+			// In WC_Settings_API::process_admin_options a call to add_error is made but nothing is done with it.
+			/* translators: 1: Regex pattern 2: Field label */
+			$message = sprintf( __( '%1$s is not a valid regex pattern in %2$s.', 'woo-costcentre-gateway' ), sanitize_text_field( wp_unslash( $value ) ), $settings_field['title'] );
+			WC_Admin_Settings::add_error( $message );
+			throw new Exception( $message );
+		}
+
+		return wp_unslash( $value );
+	}
+
+	/**
+	 * Generate Regexp Input HTML.
+	 *
+	 * @param string $key Field key.
+	 * @param array  $data Field data.
+	 * @since  1.0.0
+	 * @return string
+	 */
+	public function generate_regex_html( $key, $data ) {
+		unset( $data['type'] );
+		return $this->generate_text_html( $key, $data );
 	}
 }
