@@ -12,7 +12,7 @@
  * @package           Woo_Costcentre_Gateway
  *
  * @wordpress-plugin
- * Plugin Name:          WooCommerce Cost Centre Gateway
+ * Plugin Name:          Cost Centre Gateway for WooCommerce
  * Plugin URI:           https://github.com/mbezuidenhout/woocommerce-costcentre-gateway
  * Description:          Process payments made via company cost centre.
  * Version:              1.1.0
