@@ -214,7 +214,7 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 				'title'       => __( 'Cost Centre Pattern', 'woo-costcentre-gateway' ),
 				'type'        => 'regex',
 				'description' => __( 'Cost centre number regex pattern. See <a href="https://regexr.com">https://regexr.com</a> for guide.', 'woo-costcentre-gateway' ),
-				'default'     => '/^ZA\d{8}$/i',
+				'default'     => '/^.+$/',
 				'desc_tip'    => false,
 			],
 		];
@@ -259,7 +259,7 @@ class WC_Gateway_Costcentre extends WC_Payment_Gateway {
 	public function validate_regex_field( $key, $value ) {
 		$is_valid = true;
 		try {
-			if ( false === @preg_match( wp_unslash( $value ), '' ) ) {
+			if ( false === @preg_match( wp_unslash( $value ), '' ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 				$is_valid = false;
 			}
 		} catch ( Exception $e ) {
