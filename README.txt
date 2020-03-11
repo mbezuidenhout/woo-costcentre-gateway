@@ -17,7 +17,7 @@ Allow users to use a company cost centre in order to make payments.
 This plugin is focused on providing users with the ability to use their company cost centre to make payments for
 goods and services. The target audience is corporations that want to allow their users to make use of their cost centres.
 
-Note that the payment will be in a pending state until approved by an administrator.
+Note that the payment will be in a "On Hold" state until approved by an administrator.
 
 == Frequently Asked Questions ==
 
@@ -25,3 +25,7 @@ Note that the payment will be in a pending state until approved by an administra
 
 The plugin adds a payment method to WooCommerce. Users are then presented by a text fields upon checkout which the user
 must complete in order for the order to move to a pending state.
+
+= Where do I get the cost centre number? =
+
+Open the order on the WordPress admin pages. You will find the order number in the Cost Centre details meta box.
