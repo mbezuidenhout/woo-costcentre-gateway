@@ -12,16 +12,20 @@
  * @package           Woo_Costcentre_Gateway
  *
  * @wordpress-plugin
- * Plugin Name:       WooCommerce Cost Centre Gateway
- * Plugin URI:        https://github.com/mbezuidenhout/woocommerce-costcentre-gateway
- * Description:       Process payments made via company cost centre.
- * Version:           1.1.0
- * Author:            Marius Bezuidenhout
- * Author URI:        https://profiles.wordpress.org/mbezuidenhout/
- * License:           GPL-2.0+
- * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:       woo-costcentre-gateway
- * Domain Path:       /languages
+ * Plugin Name:          WooCommerce Cost Centre Gateway
+ * Plugin URI:           https://github.com/mbezuidenhout/woocommerce-costcentre-gateway
+ * Description:          Process payments made via company cost centre.
+ * Version:              1.1.0
+ * Requires at least:    5.0
+ * Tested up to:         5.4
+ * WC tested up to:      4.0.0
+ * WC requires at least: 3.0
+ * Author:               Marius Bezuidenhout
+ * Author URI:           https://profiles.wordpress.org/mbezuidenhout/
+ * License:              GPL-2.0+
+ * License URI:          http://www.gnu.org/licenses/gpl-2.0.txt
+ * Text Domain:          woo-costcentre-gateway
+ * Domain Path:          /languages
  */
 
 // If this file is called directly, abort.
